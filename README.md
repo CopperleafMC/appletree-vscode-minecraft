@@ -1,10 +1,14 @@
 # Appletree Minecraft Tools
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 An early prototype of **Appletree Minecraft Tools**, a VS Code extension for building, validating, launching, and locally deploying Minecraft projects through a small project-owned profile.
 
 The core design rule is that the extension orchestrates workflows; it does not replace Gradle, Fabric Loom, ForgeGradle, NeoGradle, project scripts, or launchers. Each repository remains the authority for its own commands.
 
 This is an independent Git repository inside **minecraft Copperleaf**. Its recommended remote repository slug is `appletree-vscode-minecraft`; the shared protocol/schema foundation will later live in the separate `Appletree` project. The current ownership contract is maintained in the sibling **Metaler Render** project under `docs/PROJECT_FAMILY.md`.
+
+Appletree Minecraft Tools is available under the [MIT License](LICENSE).
 
 ## Prototype experience
 

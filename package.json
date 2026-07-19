@@ -4,6 +4,15 @@
   "description": "Build, validate, launch, and deploy profile-driven Minecraft projects from VS Code.",
   "version": "0.0.1",
   "publisher": "local-prototype",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ConlanSykes/appletree-vscode-minecraft.git"
+  },
+  "homepage": "https://github.com/ConlanSykes/appletree-vscode-minecraft#readme",
+  "bugs": {
+    "url": "https://github.com/ConlanSykes/appletree-vscode-minecraft/issues"
+  },
   "engines": {
     "vscode": "^1.125.0"
   },
