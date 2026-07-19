@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.0.3
+
+- Corrected icon depth ordering so the entire tree renders in front of the voxel platform.
+
 ## 0.0.2
 
 - Added an original voxel sapling, apple, and grass-block extension icon.

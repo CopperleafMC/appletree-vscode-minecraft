@@ -2,7 +2,7 @@
   "name": "appletree-minecraft-tools",
   "displayName": "Appletree Minecraft Tools",
   "description": "Build, validate, launch, and deploy profile-driven Minecraft projects from VS Code.",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "publisher": "local-prototype",
   "icon": "media/appletree-icon.png",
   "license": "MIT",
