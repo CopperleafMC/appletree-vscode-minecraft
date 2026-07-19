@@ -1,5 +1,9 @@
 # Appletree Minecraft Tools
 
+<p align="center">
+	<img src="media/appletree-icon.png" width="128" height="128" alt="Appletree Minecraft Tools voxel sapling icon">
+</p>
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 An early prototype of **Appletree Minecraft Tools**, a VS Code extension for building, validating, launching, and locally deploying Minecraft projects through a small project-owned profile.

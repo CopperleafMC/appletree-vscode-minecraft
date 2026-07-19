@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" shape-rendering="crispEdges">
+  <!-- Original voxel-style Copperleaf/Appletree mark. -->
+  <rect width="128" height="128" fill="#182218" rx="16"/>
+
+  <!-- Sapling canopy: deliberately blocky, no borrowed game textures. -->
+  <path fill="#2f7d32" d="M44 14h32v8h16v16h10v30H86v12H42V68H26V38h10V22h8z"/>
+  <path fill="#4cae4f" d="M44 22h24v8h16v16h10v14H78v12H50V60H34V46h10z"/>
+  <path fill="#72c96d" d="M44 30h16v8h16v8h8v8H68v10H52V54H42v-8h2z"/>
+  <path fill="#1f5f29" d="M26 52h16v16h8v12h-8V68H26zm60-14h16v30H86V58H76V46h10z"/>
+
+  <!-- Copperleaf accent leaves. -->
+  <path fill="#c77a3d" d="M28 38h16v14H28zm50-16h14v16H78z"/>
+  <path fill="#efad67" d="M32 38h8v8h-8zm50-12h8v8h-8z"/>
+
+  <!-- Trunk. -->
+  <path fill="#5f3b22" d="M56 62h18v34H56z"/>
+  <path fill="#9a6031" d="M62 62h12v34H62z"/>
+  <path fill="#c6874c" d="M64 66h6v22h-6z"/>
+
+  <!-- Isometric grass block. -->
+  <path fill="#5aa74b" d="M16 82l48-24 48 24-48 24z"/>
+  <path fill="#7bc85c" d="M28 82l36-18 36 18-36 18z"/>
+  <path fill="#3c873d" d="M16 82l48 24v18L16 100z"/>
+  <path fill="#265f31" d="M112 82l-48 24v18l48-24z"/>
+  <path fill="#7a4b29" d="M24 94l40 20v10l-40-20z"/>
+  <path fill="#5d351f" d="M104 94l-40 20v10l40-20z"/>
+
+  <!-- Pixel soil details. -->
+  <path fill="#b47642" d="M30 96l8 4v6l-8-4zm18 10l8 4v6l-8-4z"/>
+  <path fill="#8e572f" d="M96 96l-8 4v6l8-4zm-18 10l-8 4v6l8-4z"/>
+
+  <!-- Foreground apple: intentionally painted last so it sits over leaves and trunk. -->
+  <path fill="#431619" d="M76 38h10v8h6v6h6v18h-6v8H72v-6h-8V52h6v-6h6z"/>
+  <path fill="#7b1f22" d="M72 46h18v6h6v16h-8v8H72v-6h-6V54h6z"/>
+  <path fill="#d4473f" d="M74 48h12v6h6v10h-6v6H74v-6h-4V54h4z"/>
+  <path fill="#ff9a67" d="M74 50h6v6h-6z"/>
+  <path fill="#654227" d="M78 36h6v12h-6z"/>
+  <path fill="#72c96d" d="M84 38h10v6H84z"/>
+</svg>

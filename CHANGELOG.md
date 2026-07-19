@@ -1,5 +1,10 @@
 # Change Log
 
+## 0.0.2
+
+- Added an original voxel sapling, apple, and grass-block extension icon.
+- Replaced the generic Activity Bar glyph with a monochrome pixel-art sapling mark.
+
 ## 0.0.1
 
 - Added a profile-driven Minecraft project model and JSON schema.

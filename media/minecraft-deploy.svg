@@ -1,3 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-  <path fill="currentColor" d="M4 3h16a1 1 0 0 1 1 1v9.5a1 1 0 0 1-2 0V5H5v14h7a1 1 0 1 1 0 2H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Zm4 4h8a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1Zm1 2v2h6V9H9Zm8 5.6 4.7 4.7a1 1 0 0 1-1.4 1.4L18 18.4V23a1 1 0 1 1-2 0v-4.6l-2.3 2.3a1 1 0 0 1-1.4-1.4l4.7-4.7Z"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" shape-rendering="crispEdges">
+  <!-- Monochrome voxel sapling for VS Code Activity Bar themes. -->
+  <path fill="currentColor" d="M9 1h6v2h3v3h2v6h-3v2h-4v3l4-2 5 3v2l-5 3-5-3-5 3-5-3v-2l5-3 4 2v-3H7v-2H4V6h2V3h3V1Zm0 2v2H6v5h3v2h6v-2h3V6h-3V3H9Zm3 14-3 2 3 2 3-2-3-2Z"/>
+  <path fill="currentColor" d="M14 5h3v3h-3V5Z" opacity=".65"/>
 </svg>
