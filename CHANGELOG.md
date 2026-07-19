@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.0.4
+
+- Centered the tree roots on the voxel platform and restored visible grass in front.
+
 ## 0.0.3
 
 - Corrected icon depth ordering so the entire tree renders in front of the voxel platform.

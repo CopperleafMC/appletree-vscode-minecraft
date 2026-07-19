@@ -14,12 +14,12 @@
   <path fill="#b47642" d="M30 96l8 4v6l-8-4zm18 10l8 4v6l-8-4z"/>
   <path fill="#8e572f" d="M96 96l-8 4v6l8-4zm-18 10l-8 4v6l8-4z"/>
 
-  <!-- Foreground trunk: painted after the platform so the whole tree grows in front of it. -->
-  <path fill="#4a2b1b" d="M54 58h22v42H54z"/>
-  <path fill="#7a4827" d="M58 60h16v38H58z"/>
-  <path fill="#a96734" d="M64 62h10v34H64z"/>
-  <path fill="#d09253" d="M66 66h5v24h-5z"/>
-  <path fill="#3b2418" d="M54 92h8v8h-8zm16 0h8v8h-8z"/>
+  <!-- Foreground trunk: roots finish at the platform center, leaving grass visible in front. -->
+  <path fill="#4a2b1b" d="M52 52h24v36H52z"/>
+  <path fill="#7a4827" d="M56 54h16v32H56z"/>
+  <path fill="#a96734" d="M62 56h10v28H62z"/>
+  <path fill="#d09253" d="M64 60h5v20h-5z"/>
+  <path fill="#3b2418" d="M52 82h8v6h-8zm16 0h8v6h-8z"/>
 
   <!-- Foreground sapling canopy: deliberately blocky, no borrowed game textures. -->
   <path fill="#173f22" d="M42 12h36v8h16v16h10v34H88v12H40V70H24V36h10V20h8z"/>
