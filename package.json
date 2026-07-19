@@ -7,11 +7,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ConlanSykes/appletree-vscode-minecraft.git"
+    "url": "https://github.com/CopperleafMC/appletree-vscode-minecraft.git"
   },
-  "homepage": "https://github.com/ConlanSykes/appletree-vscode-minecraft#readme",
+  "homepage": "https://github.com/CopperleafMC/appletree-vscode-minecraft#readme",
   "bugs": {
-    "url": "https://github.com/ConlanSykes/appletree-vscode-minecraft/issues"
+    "url": "https://github.com/CopperleafMC/appletree-vscode-minecraft/issues"
   },
   "engines": {
     "vscode": "^1.125.0"
