@@ -56,35 +56,31 @@
     },
     "commands": {
       "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "environment": { "$ref": "#/$defs/command" },
-        "buildNative": { "$ref": "#/$defs/command" },
-        "build": { "$ref": "#/$defs/command" },
-        "test": { "$ref": "#/$defs/command" },
-        "launch": { "$ref": "#/$defs/command" },
-        "visualMetal": { "$ref": "#/$defs/command" },
-        "visualVanilla": { "$ref": "#/$defs/command" },
-        "profile": { "$ref": "#/$defs/command" },
-        "profileSummary": { "$ref": "#/$defs/command" },
-        "usage": { "$ref": "#/$defs/command" }
+      "description": "Project-owned actions. Conventional IDs such as environment, buildNative, build, test, launch, visualPrimary, visualBaseline, profile, profileSummary, and usage receive standard Appletree commands and icons; other IDs remain available as custom actions.",
+      "propertyNames": {
+        "pattern": "^[a-z][A-Za-z0-9]*$"
       },
+      "additionalProperties": { "$ref": "#/$defs/command" },
       "minProperties": 1
     },
     "tests": {
       "type": "array",
+      "description": "Deterministic project-owned test lanes published in VS Code Test Explorer.",
       "items": {
         "$ref": "#/$defs/test"
       }
     },
     "evidence": {
+      "description": "Optional runtime log, crash-report, and screenshot locations.",
       "$ref": "#/$defs/evidence"
     },
     "worlds": {
+      "description": "Enables persistent development-world selection for commands that reference ${world}.",
       "$ref": "#/$defs/worlds"
     },
     "deployTargets": {
       "type": "array",
+      "description": "Confirmed local copy targets for the newest deployable artifact.",
       "items": {
         "$ref": "#/$defs/deployTarget"
       }
@@ -135,6 +131,11 @@
         "label": {
           "type": "string",
           "minLength": 1
+        },
+        "icon": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$",
+          "description": "Optional VS Code ThemeIcon ID shown for this action."
         },
         "executable": {
           "type": "string",
@@ -246,10 +247,12 @@
       "properties": {
         "directory": {
           "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "description": "Workspace-relative directory containing one folder per development world."
         },
         "default": {
-          "type": "string"
+          "type": "string",
+          "description": "Initial world used until a workspace selection is made."
         }
       }
     },

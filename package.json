@@ -2,7 +2,7 @@
   "name": "appletree-minecraft-tools",
   "displayName": "Appletree Minecraft Tools",
   "description": "Build, validate, launch, and deploy profile-driven Minecraft projects from VS Code.",
-  "version": "0.0.4",
+  "version": "0.0.10",
   "publisher": "local-prototype",
   "icon": "media/appletree-icon.png",
   "license": "MIT",
@@ -80,32 +80,44 @@
         "icon": "$(play)"
       },
       {
-        "command": "minecraftProjectDeploy.visualMetal",
-        "title": "Launch Metal Visual Variant",
+        "command": "minecraftProjectDeploy.selectWorld",
+        "title": "Select Development World...",
+        "category": "Appletree Minecraft Tools",
+        "icon": "$(globe)"
+      },
+      {
+        "command": "minecraftProjectDeploy.visualPrimary",
+        "title": "Launch Primary Visual Variant",
         "category": "Appletree Minecraft Tools",
         "icon": "$(eye)"
       },
       {
-        "command": "minecraftProjectDeploy.visualVanilla",
-        "title": "Launch Vanilla Visual Baseline",
+        "command": "minecraftProjectDeploy.visualBaseline",
+        "title": "Launch Baseline Visual Variant",
         "category": "Appletree Minecraft Tools",
         "icon": "$(compare-changes)"
       },
       {
+        "command": "minecraftProjectDeploy.runOperation",
+        "title": "Run Project Action...",
+        "category": "Appletree Minecraft Tools",
+        "icon": "$(run)"
+      },
+      {
         "command": "minecraftProjectDeploy.profile",
-        "title": "Capture Frame-Hitch Profile",
+        "title": "Capture Performance Profile",
         "category": "Appletree Minecraft Tools",
         "icon": "$(pulse)"
       },
       {
         "command": "minecraftProjectDeploy.profileSummary",
-        "title": "Summarize Latest Frame Profile",
+        "title": "Summarize Latest Profile",
         "category": "Appletree Minecraft Tools",
         "icon": "$(graph)"
       },
       {
         "command": "minecraftProjectDeploy.usage",
-        "title": "Capture CPU, GPU, and Memory Usage",
+        "title": "Capture Resource Usage",
         "category": "Appletree Minecraft Tools",
         "icon": "$(dashboard)"
       },
@@ -147,7 +159,7 @@
           "type": "string",
           "default": "minecraft-project.json",
           "scope": "resource",
-          "description": "Workspace-relative path to the Minecraft project deployment profile."
+          "description": "Workspace-relative path to the Appletree project profile."
         },
         "minecraftProjectDeploy.autoRevealOutput": {
           "type": "boolean",
@@ -179,19 +191,7 @@
         "properties": {
           "operation": {
             "type": "string",
-            "enum": [
-              "environment",
-              "buildNative",
-              "build",
-              "test",
-              "launch",
-              "visualMetal",
-              "visualVanilla",
-              "profile",
-              "profileSummary",
-              "usage"
-            ],
-            "description": "The profile command to execute."
+            "description": "The profile-defined command ID to execute."
           },
           "projectFolder": {
             "type": "string",
@@ -206,7 +206,7 @@
         {
           "id": "minecraftProjectDeploy",
           "title": "Appletree Minecraft Tools",
-          "icon": "media/minecraft-deploy.svg"
+          "icon": "media/appletree-icon.svg"
         }
       ]
     },
@@ -229,7 +229,7 @@
     "viewsWelcome": [
       {
         "view": "minecraftProjectDeploy.project",
-        "contents": "No Minecraft deployment profile was found. Add a `minecraft-project.json` profile to the workspace root, then refresh.\n[Refresh](command:minecraftProjectDeploy.refresh)"
+        "contents": "No Appletree project profile was found. Add `minecraft-project.json` to the workspace root, then refresh.\n[Refresh](command:minecraftProjectDeploy.refresh)"
       }
     ],
     "menus": {

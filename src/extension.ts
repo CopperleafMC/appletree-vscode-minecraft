@@ -6,21 +6,24 @@ import * as vscode from 'vscode';
 
 const taskType = 'minecraft-project';
 const source = 'Appletree Minecraft Tools';
+const standardOperationIcons: Readonly<Record<string, string>> = {
+  environment: 'pass',
+  buildNative: 'tools',
+  build: 'package',
+  test: 'beaker',
+  launch: 'play',
+  visualPrimary: 'eye',
+  visualBaseline: 'compare-changes',
+  profile: 'pulse',
+  profileSummary: 'graph',
+  usage: 'dashboard',
+};
 
-type Operation =
-  | 'environment'
-  | 'buildNative'
-  | 'build'
-  | 'test'
-  | 'launch'
-  | 'visualMetal'
-  | 'visualVanilla'
-  | 'profile'
-  | 'profileSummary'
-  | 'usage';
+type Operation = string;
 
 interface ProjectCommand {
   label: string;
+  icon?: string;
   executable: string;
   args?: string[];
   cwd?: string;
@@ -70,7 +73,7 @@ interface ProjectProfile {
   architectures?: string[];
   remoteSupported?: boolean;
   metadata?: ProjectMetadata;
-  commands: Partial<Record<Operation, ProjectCommand>>;
+  commands: Record<Operation, ProjectCommand>;
   tests?: ProjectTest[];
   evidence?: EvidenceConfiguration;
   worlds?: WorldConfiguration;
@@ -90,6 +93,30 @@ interface MinecraftTaskDefinition extends vscode.TaskDefinition {
 }
 
 type ProfileValidator = (value: unknown) => ProjectProfile;
+
+class WorldSelectionService {
+  constructor(private readonly state: vscode.Memento) {}
+
+  get(project: LoadedProject): string {
+    return (
+      this.state.get<string>(this.key(project)) ??
+      project.profile.worlds?.default ??
+      ''
+    );
+  }
+
+  async choose(project: LoadedProject): Promise<string | undefined> {
+    const selected = await promptForWorldSelection(project, this.get(project));
+    if (selected !== undefined) {
+      await this.state.update(this.key(project), selected);
+    }
+    return selected;
+  }
+
+  private key(project: LoadedProject): string {
+    return `selectedWorld:${project.folder.uri.toString()}`;
+  }
+}
 
 export class OperationLocks {
   private readonly holders = new Map<string, string>();
@@ -369,7 +396,10 @@ class ProjectTreeProvider
   readonly onDidChangeTreeData = this.changeEmitter.event;
   private readonly projectChanged: vscode.Disposable;
 
-  constructor(private readonly projects: ProjectService) {
+  constructor(
+    private readonly projects: ProjectService,
+    private readonly worldSelections: WorldSelectionService
+  ) {
     this.projectChanged = projects.onDidChange(() =>
       this.changeEmitter.fire(undefined)
     );
@@ -428,6 +458,23 @@ class ProjectTreeProvider
       ),
     ];
 
+    if (project.profile.worlds) {
+      nodes.splice(
+        5,
+        0,
+        new ProjectNode(
+          'Development world',
+          this.worldSelections.get(project) || 'not selected',
+          'globe',
+          {
+            command: 'minecraftProjectDeploy.selectWorld',
+            title: 'Select development world',
+            arguments: [project.folder.uri.toString()],
+          }
+        )
+      );
+    }
+
     const artifact = await findArtifact(project);
     nodes.push(
       new ProjectNode(
@@ -462,7 +509,10 @@ class ActionsTreeProvider
   readonly onDidChangeTreeData = this.changeEmitter.event;
   private readonly projectChanged: vscode.Disposable;
 
-  constructor(private readonly projects: ProjectService) {
+  constructor(
+    private readonly projects: ProjectService,
+    private readonly worldSelections: WorldSelectionService
+  ) {
     this.projectChanged = projects.onDidChange(() =>
       this.changeEmitter.fire(undefined)
     );
@@ -487,68 +537,36 @@ class ActionsTreeProvider
   }
 
   private projectNode(project: LoadedProject): ProjectNode {
-    const actions: Array<[Operation, string, string, string]> = [
-      [
-        'environment',
-        'Check environment',
-        'minecraftProjectDeploy.checkEnvironment',
-        'pass',
-      ],
-      [
-        'buildNative',
-        'Build native components',
-        'minecraftProjectDeploy.buildNative',
-        'tools',
-      ],
-      ['build', 'Build project', 'minecraftProjectDeploy.build', 'package'],
-      ['test', 'Run project tests', 'minecraftProjectDeploy.test', 'beaker'],
-      [
-        'launch',
-        'Launch development client',
-        'minecraftProjectDeploy.launch',
-        'play',
-      ],
-      [
-        'visualMetal',
-        'Launch Metal visual variant',
-        'minecraftProjectDeploy.visualMetal',
-        'eye',
-      ],
-      [
-        'visualVanilla',
-        'Launch vanilla visual baseline',
-        'minecraftProjectDeploy.visualVanilla',
-        'compare-changes',
-      ],
-      [
-        'profile',
-        'Capture frame-hitch profile',
-        'minecraftProjectDeploy.profile',
-        'pulse',
-      ],
-      [
-        'profileSummary',
-        'Summarize latest frame profile',
-        'minecraftProjectDeploy.profileSummary',
-        'graph',
-      ],
-      [
-        'usage',
-        'Capture CPU, GPU, and memory usage',
-        'minecraftProjectDeploy.usage',
-        'dashboard',
-      ],
-    ];
-    const nodes = actions
-      .filter(([operation]) => project.profile.commands[operation])
-      .map(
-        ([, label, command, icon]) =>
-          new ProjectNode(label, undefined, icon, {
-            command,
-            title: label,
+    const nodes: ProjectNode[] = [];
+    if (project.profile.worlds) {
+      nodes.push(
+        new ProjectNode(
+          'Select development world…',
+          this.worldSelections.get(project) || 'not selected',
+          'globe',
+          {
+            command: 'minecraftProjectDeploy.selectWorld',
+            title: 'Select development world',
             arguments: [project.folder.uri.toString()],
-          })
+          }
+        )
       );
+    }
+    nodes.push(...Object.entries(project.profile.commands).map(
+      ([operation, command]) =>
+        new ProjectNode(
+          command.label,
+          command.args?.some((argument) => argument.includes('${world}'))
+            ? this.worldSelections.get(project) || 'world required'
+            : undefined,
+          command.icon ?? standardOperationIcons[operation] ?? 'run',
+          {
+            command: 'minecraftProjectDeploy.runOperation',
+            title: command.label,
+            arguments: [project.folder.uri.toString(), operation],
+          }
+        )
+    ));
 
     if (project.profile.deployTargets?.length) {
       nodes.push(
@@ -683,7 +701,8 @@ class EvidenceTreeProvider
 class MinecraftTaskProvider implements vscode.TaskProvider {
   constructor(
     private readonly projects: ProjectService,
-    private readonly operationLocks: OperationLocks
+    private readonly operationLocks: OperationLocks,
+    private readonly worldSelections: WorldSelectionService
   ) {}
 
   async provideTasks(): Promise<vscode.Task[]> {
@@ -698,12 +717,13 @@ class MinecraftTaskProvider implements vscode.TaskProvider {
       ) {
         continue;
       }
-      for (const operation of operations) {
+      for (const operation of Object.keys(project.profile.commands)) {
         const task = await createTask(
           project,
           operation,
           false,
-          this.operationLocks
+          this.operationLocks,
+          this.worldSelections
         );
         if (task) {
           tasks.push(task);
@@ -717,8 +737,8 @@ class MinecraftTaskProvider implements vscode.TaskProvider {
     if (!vscode.workspace.isTrusted) {
       return undefined;
     }
-    const operation = task.definition.operation as Operation | undefined;
-    if (!operation || !operations.includes(operation)) {
+    const operation = task.definition.operation;
+    if (typeof operation !== 'string' || !operation) {
       return undefined;
     }
     const projectFolder = task.definition.projectFolder;
@@ -728,7 +748,16 @@ class MinecraftTaskProvider implements vscode.TaskProvider {
     try {
       const project = await this.projects.requireProject(projectFolder);
       requireCompatibleHost(project.profile);
-      return createTask(project, operation, false, this.operationLocks);
+      if (!project.profile.commands[operation]) {
+        return undefined;
+      }
+      return createTask(
+        project,
+        operation,
+        false,
+        this.operationLocks,
+        this.worldSelections
+      );
     } catch {
       return undefined;
     }
@@ -998,19 +1027,6 @@ function terminateProcessTree(child: ChildProcess): void {
   child.once('close', () => clearTimeout(timer));
 }
 
-const operations: Operation[] = [
-  'environment',
-  'buildNative',
-  'build',
-  'test',
-  'launch',
-  'visualMetal',
-  'visualVanilla',
-  'profile',
-  'profileSummary',
-  'usage',
-];
-
 function collectRunnableTests(
   request: vscode.TestRunRequest,
   roots: vscode.TestItemCollection,
@@ -1071,8 +1087,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   const profileValidator = await loadProfileValidator(context);
   const projects = new ProjectService(profileValidator);
   const operationLocks = new OperationLocks();
-  const projectTree = new ProjectTreeProvider(projects);
-  const actionsTree = new ActionsTreeProvider(projects);
+  const worldSelections = new WorldSelectionService(context.workspaceState);
+  const projectTree = new ProjectTreeProvider(projects, worldSelections);
+  const actionsTree = new ActionsTreeProvider(projects, worldSelections);
   const evidenceTree = new EvidenceTreeProvider(projects);
   const testProvider = new MinecraftTestProvider(projects, operationLocks);
 
@@ -1096,7 +1113,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     ),
     vscode.tasks.registerTaskProvider(
       taskType,
-      new MinecraftTaskProvider(projects, operationLocks)
+      new MinecraftTaskProvider(projects, operationLocks, worldSelections)
     ),
     vscode.workspace.onDidChangeConfiguration((event) => {
       if (event.affectsConfiguration('minecraftProjectDeploy')) {
@@ -1117,65 +1134,133 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         });
       }
     ),
+    vscode.commands.registerCommand(
+      'minecraftProjectDeploy.selectWorld',
+      async (projectFolder?: string) => {
+        await showError(async () => {
+          requireTrust();
+          const project = await projects.requireProject(projectFolder);
+          if (!project.profile.worlds) {
+            throw new Error('The project profile does not define worlds.');
+          }
+          const selected = await worldSelections.choose(project);
+          if (selected !== undefined) {
+            projects.refresh();
+            vscode.window.setStatusBarMessage(
+              `Appletree: selected ${selected} for ${project.profile.name}`,
+              4000
+            );
+          }
+        });
+      }
+    ),
     registerOperationCommand(
       'minecraftProjectDeploy.checkEnvironment',
       'environment',
       projects,
-      operationLocks
+      operationLocks,
+      worldSelections
     ),
     registerOperationCommand(
       'minecraftProjectDeploy.buildNative',
       'buildNative',
       projects,
-      operationLocks
+      operationLocks,
+      worldSelections
     ),
     registerOperationCommand(
       'minecraftProjectDeploy.build',
       'build',
       projects,
-      operationLocks
+      operationLocks,
+      worldSelections
     ),
     registerOperationCommand(
       'minecraftProjectDeploy.test',
       'test',
       projects,
-      operationLocks
+      operationLocks,
+      worldSelections
     ),
     registerOperationCommand(
       'minecraftProjectDeploy.launch',
       'launch',
       projects,
-      operationLocks
+      operationLocks,
+      worldSelections
     ),
     registerOperationCommand(
-      'minecraftProjectDeploy.visualMetal',
-      'visualMetal',
+      'minecraftProjectDeploy.visualPrimary',
+      'visualPrimary',
       projects,
-      operationLocks
+      operationLocks,
+      worldSelections
     ),
     registerOperationCommand(
-      'minecraftProjectDeploy.visualVanilla',
-      'visualVanilla',
+      'minecraftProjectDeploy.visualBaseline',
+      'visualBaseline',
       projects,
-      operationLocks
+      operationLocks,
+      worldSelections
+    ),
+    vscode.commands.registerCommand(
+      'minecraftProjectDeploy.runOperation',
+      async (projectFolder?: string, requestedOperation?: string) => {
+        await showError(async () => {
+          requireTrust();
+          const project = await projects.requireProject(projectFolder);
+          requireCompatibleHost(project.profile);
+          let operation = requestedOperation;
+          if (!operation) {
+            const selected = await vscode.window.showQuickPick(
+              Object.entries(project.profile.commands).map(([id, command]) => ({
+                label: command.label,
+                description: id,
+                operation: id,
+              })),
+              { placeHolder: 'Select a project action' }
+            );
+            if (!selected) {
+              return;
+            }
+            operation = selected.operation;
+          }
+          const task = await createTask(
+            project,
+            operation,
+            true,
+            operationLocks,
+            worldSelections
+          );
+          if (!task) {
+            throw new Error(
+              `The project profile does not define a ${operation} command.`
+            );
+          }
+          await vscode.tasks.executeTask(task);
+        });
+      }
     ),
     registerOperationCommand(
       'minecraftProjectDeploy.profile',
       'profile',
       projects,
-      operationLocks
+      operationLocks,
+      worldSelections
     ),
     registerOperationCommand(
       'minecraftProjectDeploy.profileSummary',
       'profileSummary',
       projects,
-      operationLocks
+      operationLocks,
+      worldSelections
     ),
     registerOperationCommand(
       'minecraftProjectDeploy.usage',
       'usage',
       projects,
-      operationLocks
+      operationLocks,
+      worldSelections
     ),
     vscode.commands.registerCommand(
       'minecraftProjectDeploy.deploy',
@@ -1240,7 +1325,8 @@ function registerOperationCommand(
   commandId: string,
   operation: Operation,
   projects: ProjectService,
-  operationLocks: OperationLocks
+  operationLocks: OperationLocks,
+  worldSelections: WorldSelectionService
 ): vscode.Disposable {
   return vscode.commands.registerCommand(commandId, async (projectFolder?: string) => {
     await showError(async () => {
@@ -1251,7 +1337,8 @@ function registerOperationCommand(
         project,
         operation,
         true,
-        operationLocks
+        operationLocks,
+        worldSelections
       );
       if (!task) {
         throw new Error(
@@ -1267,20 +1354,24 @@ async function createTask(
   project: LoadedProject,
   operation: Operation,
   promptForWorld = false,
-  operationLocks?: OperationLocks
+  operationLocks?: OperationLocks,
+  worldSelections?: WorldSelectionService
 ): Promise<vscode.Task | undefined> {
   const command = project.profile.commands[operation];
   if (!command) {
     return undefined;
   }
 
-  let world = project.profile.worlds?.default ?? '';
+  let world = worldSelections?.get(project) ?? project.profile.worlds?.default ?? '';
   if (
     command.args?.some((argument) => argument.includes('${world}')) &&
     project.profile.worlds &&
-    promptForWorld
+    promptForWorld &&
+    !world
   ) {
-    const selected = await selectWorld(project, world);
+    const selected = worldSelections
+      ? await worldSelections.choose(project)
+      : await promptForWorldSelection(project, world);
     if (!selected) {
       return undefined;
     }
@@ -1354,7 +1445,7 @@ async function createTask(
   return task;
 }
 
-async function selectWorld(
+async function promptForWorldSelection(
   project: LoadedProject,
   preferred: string
 ): Promise<string | undefined> {

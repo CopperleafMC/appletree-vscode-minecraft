@@ -3,6 +3,8 @@
 out/**
 node_modules/**
 src/**
+media/Color-tree.svg
+media/minecraft-deploy.svg
 .gitignore
 .yarnrc
 esbuild.js
